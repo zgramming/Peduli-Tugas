@@ -104,7 +104,7 @@ class SettingScreen extends StatelessWidget {
                               title: 'Export',
                               foregroundColor: colorPallete.white,
                               backgroundColor: colorPallete.primaryColor,
-                              onTap: () async => await CRUDFunction.shareBackup(
+                              onTap: () async => await CRUDFunction.exportData(
                                 context,
                                 onExportProgress: (totalDataExport) async => await showDialog(
                                   context: context,
@@ -122,7 +122,7 @@ class SettingScreen extends StatelessWidget {
                               title: 'Import',
                               foregroundColor: colorPallete.white,
                               backgroundColor: colorPallete.green,
-                              onTap: () async => await CRUDFunction.pickedSharedBackup(
+                              onTap: () async => await CRUDFunction.importData(
                                 context,
                                 onProgressImport: (totalData) async => await showDialog(
                                   barrierDismissible: false,
