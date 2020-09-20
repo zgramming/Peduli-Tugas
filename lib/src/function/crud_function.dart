@@ -449,48 +449,56 @@ class CRUDFunction {
     BuildContext context, {
     Function(int totalDataExport) onExportProgress,
   }) async {
-    context.read(GlobalProgressExport).state = 0;
-    var tempMap = <String, List>{};
-    final dosen = context.read(dosenProvider.state);
-    final pelajaran = context.read(pelajaranProvider.state);
-    final tugas = context.read(tugasProvider.state);
-    if (dosen == null || dosen.isEmpty) {
-      tempMap['dosen'] = [];
-    } else {
-      tempMap['dosen'] = [...dosen];
-    }
-    context.read(GlobalProgressExport).state += tempMap['dosen'].length;
-    if (pelajaran == null || pelajaran.isEmpty) {
-      tempMap['pelajaran'] = [];
-    } else {
-      tempMap['pelajaran'] = [...pelajaran];
-    }
-    context.read(GlobalProgressExport).state += tempMap['pelajaran'].length;
+    var message;
+    var toastType;
+    try {
+      context.read(GlobalProgressExport).state = 0;
+      var tempMap = <String, List>{};
+      final dosen = context.read(dosenProvider.state);
+      final pelajaran = context.read(pelajaranProvider.state);
+      final tugas = context.read(tugasProvider.state);
 
-    if (tugas == null || tugas.isEmpty) {
-      tempMap['tugas'] = [];
-    } else {
-      tempMap['tugas'] = [...tugas];
-    }
-    context.read(GlobalProgressExport).state += tempMap['tugas'].length;
-    onExportProgress(dosen.length + pelajaran.length + tugas.length);
+      if (dosen == null || dosen.isEmpty) {
+        tempMap['dosen'] = [];
+      } else {
+        tempMap['dosen'] = [...dosen];
+      }
+      context.read(GlobalProgressExport).state += tempMap['dosen'].length;
 
-    var file = await CRUDFunction()._writeBackup(tempMap);
-    // print(file);
-    if (file == null) {
-      await GlobalFunction.showToast(
-        message: 'Terjadi masalah saat mem-backup data',
-        toastType: ToastType.Error,
+      if (pelajaran == null || pelajaran.isEmpty) {
+        tempMap['pelajaran'] = [];
+      } else {
+        tempMap['pelajaran'] = [...pelajaran];
+      }
+      context.read(GlobalProgressExport).state += tempMap['pelajaran'].length;
+
+      if (tugas == null || tugas.isEmpty) {
+        tempMap['tugas'] = [];
+      } else {
+        tempMap['tugas'] = [...tugas];
+      }
+      context.read(GlobalProgressExport).state += tempMap['tugas'].length;
+
+      onExportProgress(dosen.length + pelajaran.length + tugas.length);
+
+      var file = await CRUDFunction()._writeBackup(tempMap);
+      // print(file);
+      if (file == null) {
+        message = 'Terjadi masalah saat mem-backup data';
+        throw message;
+      }
+
+      final path = await CRUDFunction()._localPath;
+
+      await Share.shareFiles(
+        ['$path/$_fileNameBackup'],
+        text: 'Data Dosen , Pelajaran dan Tugas Aplikasi Peduli Tugas ',
       );
-      return null;
+    } catch (e) {
+      message = e.toString();
+      toastType = ToastType.Error;
     }
-
-    final path = await CRUDFunction()._localPath;
-
-    await Share.shareFiles(
-      ['$path/$_fileNameBackup'],
-      text: 'Data Dosen , Pelajaran dan Tugas Aplikasi Peduli Tugas ',
-    );
+    await GlobalFunction.showToast(message: message, toastType: toastType);
   }
 
   static Future<void> importData(
