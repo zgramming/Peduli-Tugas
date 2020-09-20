@@ -15,7 +15,7 @@ import 'functions.dart';
 
 class CRUDFunction {
   static const _fileNameBackup = 'peduli_tugas_export.txt';
-
+  static const _filterFileNameBackup = 'peduli_tugas_export';
   static Future<void> addAndUpdateDosen(
     BuildContext context,
     GlobalKey<FormState> formKey, {
@@ -445,7 +445,7 @@ class CRUDFunction {
   ///* End Write File
 
   ///* Share Backup File
-  static Future<void> shareBackup(
+  static Future<void> exportData(
     BuildContext context, {
     Function(int totalDataExport) onExportProgress,
   }) async {
@@ -493,108 +493,114 @@ class CRUDFunction {
     );
   }
 
-  static Future<void> pickedSharedBackup(
+  static Future<void> importData(
     BuildContext context, {
     Function(int totalDataImport) onProgressImport,
   }) async {
-    ///* Fungsi untuk memilih file dari file explorer
-    var filePicker =
-        await FilePicker.platform.pickFiles(allowedExtensions: ['txt'], type: FileType.custom);
+    var message;
+    var toastType;
+    try {
+      ///* Fungsi untuk memilih file dari file explorer
+      var filePicker =
+          await FilePicker.platform.pickFiles(allowedExtensions: ['txt'], type: FileType.custom);
 
-    ///* Handle jika user tidak jadi pilih file
-    if (filePicker == null) {
-      await GlobalFunction.showToast(
-        message: 'Terjadi masalah saat memilih file',
-        toastType: ToastType.Error,
-        isLongDuration: true,
-      );
-      return null;
-    }
+      ///* Handle jika user tidak jadi pilih file
+      if (filePicker == null) {
+        message = 'Terjadi masalah saat memilih file';
+        throw message;
+      }
 
-    final file = File(filePicker.files.single.path);
+      final file = File(filePicker.files.single.path);
 
-    ///* Handle jika nama file tidak sesuai dengan [fileNameBackup = peduli_tugas_export.txt]
-    var fileName = file.path.split('/').last;
-    if (!fileName.contains(_fileNameBackup)) {
-      await GlobalFunction.showToast(
-        message: 'File tidak sesuai , pastikan file yang dipilih sesuai',
-        toastType: ToastType.Error,
-        isLongDuration: true,
-      );
-      return null;
-    }
+      ///* Handle jika nama file tidak sesuai dengan [fileNameBackup = peduli_tugas_export.txt]
+      var fileName = file.path.split('/').last;
+      if (!fileName.contains(_filterFileNameBackup)) {
+        message = 'File tidak sesuai , pastikan file yang dipilih sudah benar';
+        throw message;
+      }
 
-    ///* Handle jika isi file kosong
-    final readFile = await CRUDFunction.readBackup(file);
-    if (readFile == null) {
-      await GlobalFunction.showToast(
-        message: 'Isi file kosong',
-        toastType: ToastType.Error,
-        isLongDuration: true,
-      );
-      return null;
-    }
+      ///* Handle jika isi file kosong
+      final readFile = await CRUDFunction.readBackup(file);
+      if (readFile == null) {
+        message = 'Isi file kosong';
+        throw message;
+      }
 
-    final List decodedDosen = readFile['dosen'];
-    final List decodedPelajaran = readFile['pelajaran'];
-    final List decodedTugas = readFile['tugas'];
+      final List decodedDosen = readFile['dosen'];
+      final List decodedPelajaran = readFile['pelajaran'];
+      final List decodedTugas = readFile['tugas'];
 
-    ///* Proses mapping sesuai dengan modelnya
-    final resultDosen = decodedDosen.map((e) => DosenModel.fromJson(e)).toList();
-    final resultPelajaran = decodedPelajaran.map((e) => PelajaranModel.fromJson(e)).toList();
-    final resultTugas = decodedTugas.map((e) => TugasModel.fromJson(e)).toList();
-    onProgressImport(resultDosen.length + resultPelajaran.length + resultTugas.length);
-    var count = 1;
+      ///* Proses mapping sesuai dengan modelnya
+      final resultDosen = decodedDosen.map((e) => DosenModel.fromJson(e)).toList();
+      final resultPelajaran = decodedPelajaran.map((e) => PelajaranModel.fromJson(e)).toList();
+      final resultTugas = decodedTugas.map((e) => TugasModel.fromJson(e)).toList();
+      onProgressImport(resultDosen.length + resultPelajaran.length + resultTugas.length);
 
-    ///* Mulai melakukan import
-    for (var dsn in resultDosen) {
-      await context.read(dosenProvider).importDosen(dsn);
-      context.read(GlobalProgressImport).state = count++;
-    }
-    for (var plj in resultPelajaran) {
-      final whenReminderShow =
-          CommonFunction.chooseReminderType(plj.reminderModel, plj.durationReminder);
-      await context.read(pelajaranProvider).importPelajaran(plj);
-      context.read(GlobalProgressImport).state = count++;
-      if (whenReminderShow != null) {
-        final combineDateTime = DateTime(
-          plj.waktuPelajaran.year,
-          plj.waktuPelajaran.month,
-          plj.waktuPelajaran.day,
-          plj.waktuPelajaran.hour,
-          plj.waktuPelajaran.minute,
-        );
-        final pelajaran = context.read(showPelajaranById(plj.idPelajaran));
-        for (var i = 0; i < pelajaran.hari.length; i++) {
-          final newCombineDate = combineDateTime.subtract(whenReminderShow);
-          await notificationPlugin.showWeeklyAtDayTime(
-            dayValue: pelajaran.hari[i].idDay,
-            time: Time(newCombineDate.hour, newCombineDate.minute, 0),
-            id: plj.waktuPelajaran.millisecondsSinceEpoch ~/ 1000 + i,
-            titleNotification: 'Bersiap untuk pelajaran ${pelajaran.namePelajaran}',
-            bodyNotification:
-                'Pelajaran akan dimulai pada jam ${GlobalFunction.formatHoursMinutes(combineDateTime)}',
-            payloadNotification: plj.idPelajaran.toString(),
+      ///* Initialize value for looping import
+      var count = 1;
+
+      ///* Mulai melakukan import
+      for (var dsn in resultDosen) {
+        await context.read(dosenProvider).importDosen(dsn);
+        context.read(GlobalProgressImport).state = count++;
+      }
+      for (var plj in resultPelajaran) {
+        final whenReminderShow =
+            CommonFunction.chooseReminderType(plj.reminderModel, plj.durationReminder);
+        await context.read(pelajaranProvider).importPelajaran(plj);
+        context.read(GlobalProgressImport).state = count++;
+        if (whenReminderShow != null) {
+          final combineDateTime = DateTime(
+            plj.waktuPelajaran.year,
+            plj.waktuPelajaran.month,
+            plj.waktuPelajaran.day,
+            plj.waktuPelajaran.hour,
+            plj.waktuPelajaran.minute,
+          );
+          final pelajaran = context.read(showPelajaranById(plj.idPelajaran));
+          for (var i = 0; i < pelajaran.hari.length; i++) {
+            final newCombineDate = combineDateTime.subtract(whenReminderShow);
+            await notificationPlugin.showWeeklyAtDayTime(
+              dayValue: pelajaran.hari[i].idDay,
+              time: Time(newCombineDate.hour, newCombineDate.minute, 0),
+              id: plj.waktuPelajaran.millisecondsSinceEpoch ~/ 1000 + i,
+              titleNotification: 'Bersiap untuk pelajaran ${pelajaran.namePelajaran}',
+              bodyNotification:
+                  'Pelajaran akan dimulai pada jam ${GlobalFunction.formatHoursMinutes(combineDateTime)}',
+              payloadNotification: plj.idPelajaran.toString(),
+            );
+          }
+        }
+      }
+      for (var tgs in resultTugas) {
+        final whenReminderShow =
+            CommonFunction.chooseReminderType(tgs.reminderModel, tgs.durationReminder);
+        await context.read(tugasProvider).importTugas(tgs);
+        context.read(GlobalProgressImport).state = count++;
+        if (whenReminderShow != null) {
+          await CRUDFunction._scheduleTugasNotification(
+            tgs,
+            tgs.deadlineTugas.millisecondsSinceEpoch,
+            whenReminderShow,
+            lastID: tgs.idTugas,
           );
         }
       }
-    }
-    for (var tgs in resultTugas) {
-      final whenReminderShow =
-          CommonFunction.chooseReminderType(tgs.reminderModel, tgs.durationReminder);
-      await context.read(tugasProvider).importTugas(tgs);
-      context.read(GlobalProgressImport).state = count++;
-      if (whenReminderShow != null) {
-        await CRUDFunction._scheduleTugasNotification(
-          tgs,
-          tgs.deadlineTugas.millisecondsSinceEpoch,
-          whenReminderShow,
-          lastID: tgs.idTugas,
-        );
-      }
-    }
 
-    ///* Selesai import
+      ///* For refreshing total Dosen,Pelajaran and Tugas
+      await context.refresh(totalAllDosen);
+      await context.refresh(totalAllPelajaran);
+      await context.refresh(totalAllTugas);
+
+      message = 'Proses import berhasil';
+      toastType = ToastType.Success;
+
+      ///* Selesai import
+    } catch (e) {
+      message = e.toString();
+      toastType = ToastType.Error;
+    }
+    await GlobalFunction.showToast(message: message, toastType: toastType);
   }
 
   ///* End Shared Backup FILE
