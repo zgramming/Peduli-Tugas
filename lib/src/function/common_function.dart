@@ -97,7 +97,7 @@ class CommonFunction {
   ///* Read session Darkmode
   static Future<bool> readDarkModek() async {
     final sp = await SharedPreferences.getInstance();
-    final result = await sp.getBool(_keyDarkMode);
+    final result = await sp.getBool(_keyDarkMode) ?? false;
     return result;
   }
 }
