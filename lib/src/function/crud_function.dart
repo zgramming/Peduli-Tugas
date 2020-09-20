@@ -494,6 +494,8 @@ class CRUDFunction {
         ['$path/$_fileNameBackup'],
         text: 'Data Dosen , Pelajaran dan Tugas Aplikasi Peduli Tugas ',
       );
+      message = 'Proses Export berhasil';
+      toastType = ToastType.Success;
     } catch (e) {
       message = e.toString();
       toastType = ToastType.Error;
