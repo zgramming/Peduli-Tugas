@@ -19,7 +19,7 @@ class TaskScreenDate extends StatelessWidget {
             InkWell(
               onTap: () {
                 final now = context.read(GlobalDateNowYMD).state;
-                context.read(GlobalDateNowYMD).state = now.subtract(Duration(days: 8));
+                context.read(GlobalDateNowYMD).state = now.subtract(Duration(days: 7));
               },
               child: Icon(Icons.chevron_left),
             ),
@@ -47,7 +47,7 @@ class TaskScreenDate extends StatelessWidget {
             InkWell(
               onTap: () {
                 final now = context.read(GlobalDateNowYMD).state;
-                context.read(GlobalDateNowYMD).state = now.add(Duration(days: 8));
+                context.read(GlobalDateNowYMD).state = now.add(Duration(days: 7));
               },
               child: Icon(Icons.chevron_right),
             ),
