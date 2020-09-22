@@ -81,14 +81,10 @@ class WelcomeScreen extends StatelessWidget {
                 Positioned(
                   child: Consumer(
                     builder: (context, watch, _) {
-                      final groupedTugas = watch(TPgroupedByDay(false)) as List<TugasModel>;
-                      if (groupedTugas == null) {
+                      final totTugas = watch(totalTugasProgress);
+                      if (totTugas == 0 || totTugas == null) {
                         return SizedBox();
                       }
-                      final totalTugasProgress = groupedTugas
-                          .where((element) => element.statusTugas == false)
-                          .toList()
-                          .length;
                       return Visibility(
                         child: CircleAvatar(
                           radius: 8,
@@ -97,8 +93,8 @@ class WelcomeScreen extends StatelessWidget {
                           child: FittedBox(
                             child: Padding(
                               padding: const EdgeInsets.all(2.0),
-                              child: Text('$totalTugasProgress',
-                                  style: TextStyle(fontWeight: FontWeight.bold)),
+                              child:
+                                  Text('$totTugas', style: TextStyle(fontWeight: FontWeight.bold)),
                             ),
                           ),
                         ),
