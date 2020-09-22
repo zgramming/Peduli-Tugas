@@ -33,7 +33,6 @@ class TaskScreenTabBar extends StatelessWidget {
           body: TabBarView(
             children: groupedTugas.map((deadline) {
               final tugas = watch(TPbyDeadline(deadline));
-
               if (tugas == null || tugas.isEmpty) {
                 return Center(child: Text('Tugas minggu ini tidak ada'));
               }

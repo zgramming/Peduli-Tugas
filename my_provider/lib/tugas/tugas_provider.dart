@@ -24,7 +24,7 @@ class TugasProvider extends StateNotifier<List<TugasModel>> {
     void Function(int uniqueIDNotification, int lastId) onSuccessInsert,
   }) async {
     var tempModel = model.copyWith(idTugas: await db.getLastId(TableSQL.TableTugas));
-    print('insertTugas ${tempModel.idTugas}');
+    // print('insertTugas ${tempModel.idTugas}');
     final result = await db.insertTugas(
       idTugas: tempModel.idTugas,
       nameTugas: tempModel.nameTugas,
@@ -35,7 +35,7 @@ class TugasProvider extends StateNotifier<List<TugasModel>> {
       reminderModel: tempModel.reminderModel,
     );
 
-    print('tempModel $tempModel');
+    // print('tempModel $tempModel');
     addItemIfNotExist(tempModel, typeValue: TypeValue.Object);
     if (onSuccessInsert != null) {
       onSuccessInsert(
@@ -110,28 +110,28 @@ class TugasProvider extends StateNotifier<List<TugasModel>> {
   void addItemIfNotExist(dynamic data, {TypeValue typeValue = TypeValue.List}) {
     var tempList = <TugasModel>[];
     if (data == null) {
-      // print('your data null on method addItemIfNotExist');
+      print('your data null on method addItemIfNotExist');
       return null;
     } else {
       if (typeValue == TypeValue.List) {
-        // print('type List');
+        print('type List');
         for (TugasModel newItem in data) {
           final existItem = state.firstWhere(
             (element) => element.idTugas == newItem.idTugas,
             orElse: () => null,
           );
           if (existItem == null) {
-            // print('data List not exist , add it now !');
+            print('data List not exist , add it now !');
             tempList.add(newItem);
           }
         }
       } else {
-        // print('type Object');
+        print('type Object');
         final TugasModel newItem = data;
         final existItem =
             state.firstWhere((element) => element.idTugas == newItem.idTugas, orElse: () => null);
         if (existItem == null) {
-          // print('data Object not exist , add it now !');
+          print('data Object not exist , add it now !');
           tempList.add(newItem);
         }
       }
@@ -143,7 +143,7 @@ class TugasProvider extends StateNotifier<List<TugasModel>> {
 final tugasProvider = StateNotifierProvider((ref) => TugasProvider());
 
 final showAllTugas = FutureProvider.autoDispose((ref) async {
-  final tugas = ref.read(tugasProvider);
+  final tugas = ref.watch(tugasProvider);
   final result = await tugas.showTugas();
   return result;
 });
@@ -153,9 +153,24 @@ final totalAllTugas = FutureProvider.autoDispose((ref) async {
   return result;
 });
 
+final totalTugasProgress = Provider.autoDispose((ref) {
+  // final groupedTugas = watch(TPgroupedByDay(false)) as List<TugasModel>;
+  final groupedTugas = ref.watch(TPgroupedByDay(false)) as List<TugasModel>;
+  if (groupedTugas == null) {
+    return null;
+  }
+  final totalTugasProgress =
+      groupedTugas.where((element) => element.statusTugas == false).toList().length;
+  // print('totaltugasprogress $totalTugasProgress');
+  if (totalTugasProgress == 0) {
+    return null;
+  }
+  return totalTugasProgress;
+});
+
 final tugasById = Provider.autoDispose((ref) {
   final id = ref.watch(IDTugas).state;
-  print('provider TugasBYId $id');
+  // print('provider TugasBYId $id');
   final tugas = ref.watch(tugasProvider.state);
   if (tugas == null || tugas.isEmpty) {
     return null;
@@ -170,7 +185,7 @@ final groupedTugasByStatus = Provider.autoDispose.family((ref, param) {
   for (var tgs in result) {
     tempStatus.add(tgs.statusTugas);
   }
-  print(tempStatus);
+  // print(tempStatus);
   return tempStatus.toSet().toList();
 });
 

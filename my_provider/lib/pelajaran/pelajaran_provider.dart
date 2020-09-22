@@ -159,9 +159,9 @@ final showPelajaranById = Provider.autoDispose.family((ref, idPelajaran) {
 });
 
 final showPelajaranBySemester =
-    Provider.autoDispose.family<List<PelajaranModel>, int>((ref, param) {
+    Provider.autoDispose.family<List<PelajaranModel>, int>((ref, idSemester) {
   final pelajaran = ref.watch(pelajaranProvider.state);
-  final result = pelajaran.where((element) => element.semester.idSemester == param).toList();
+  final result = pelajaran.where((element) => element.semester.idSemester == idSemester).toList();
   result.sort((a, b) => a.namePelajaran.toLowerCase().compareTo(b.namePelajaran.toLowerCase()));
   return result;
 });
