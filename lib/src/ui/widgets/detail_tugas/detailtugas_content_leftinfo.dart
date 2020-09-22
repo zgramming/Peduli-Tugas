@@ -13,22 +13,27 @@ class DetailTugasContentLeftInfo extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text.rich(
-            TextSpan(
-              style: appTheme
-                  .caption(context)
-                  .copyWith(color: colorPallete.grey, fontWeight: FontWeight.w500),
-              text: 'Dosen : ',
-              children: [
+          Consumer(
+            builder: (context, watch, _) {
+              final dosen = watch(showDosenByid(tugas.pelajaran.dosen.idDosen));
+              return Text.rich(
                 TextSpan(
-                  text: tugas.pelajaran.dosen.nameDosen,
-                  style: TextStyle(
-                    color: colorPallete.primaryColor,
-                    decoration: TextDecoration.underline,
-                  ),
-                )
-              ],
-            ),
+                  style: appTheme
+                      .caption(context)
+                      .copyWith(color: colorPallete.grey, fontWeight: FontWeight.w500),
+                  text: 'Dosen : ',
+                  children: [
+                    TextSpan(
+                      text: dosen.nameDosen,
+                      style: TextStyle(
+                        color: colorPallete.primaryColor,
+                        decoration: TextDecoration.underline,
+                      ),
+                    )
+                  ],
+                ),
+              );
+            },
           ),
           SizedBox(height: 5),
           DefaultTextStyle(

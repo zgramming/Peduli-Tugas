@@ -2,7 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:my_network/my_network.dart';
+import 'package:my_provider/my_provider.dart';
 import 'package:global_template/global_template.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import './taskscreen_tugas.dart';
 
@@ -26,19 +28,30 @@ class TaskScreenCard extends StatelessWidget {
             child: Row(
               children: [
                 Expanded(
-                  child: Text(
-                    keyPelajaran.namePelajaran,
-                    style: appTheme.subtitle1(context).copyWith(fontWeight: FontWeight.w500),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                  child: Consumer(
+                    builder: (context, watch, _) {
+                      final pelajaran = watch(showPelajaranById(keyPelajaran.idPelajaran));
+                      return Text(
+                        pelajaran.namePelajaran,
+                        style: appTheme.subtitle1(context).copyWith(fontWeight: FontWeight.w500),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      );
+                    },
                   ),
                 ),
                 InkWell(
                   onTap: () async => await Navigator.of(context).pushNamed(
-                      DetailDosenScreen.routeNamed,
-                      arguments: keyPelajaran.dosen.idDosen),
-                  child: CircleAvatar(
-                    backgroundImage: MemoryImage(base64.decode(keyPelajaran.dosen.imageDosen)),
+                    DetailDosenScreen.routeNamed,
+                    arguments: keyPelajaran.dosen.idDosen,
+                  ),
+                  child: Consumer(
+                    builder: (context, watch, _) {
+                      final dosen = watch(showDosenByid(keyPelajaran.dosen.idDosen));
+                      return CircleAvatar(
+                        backgroundImage: MemoryImage(base64.decode(dosen.imageDosen)),
+                      );
+                    },
                   ),
                 ),
               ],

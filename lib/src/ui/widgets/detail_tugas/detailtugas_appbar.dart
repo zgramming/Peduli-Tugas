@@ -7,7 +7,10 @@ class DetailTugasAppbar extends ConsumerWidget {
   Widget build(BuildContext context, ScopedReader watch) {
     final tugas = watch(tugasById);
     return Positioned(
-      child: AppBar(title: Text(tugas.pelajaran.namePelajaran)),
+      child: AppBar(title: Consumer(builder: (context, watch, _) {
+        final pelajaran = watch(showPelajaranById(tugas.pelajaran.idPelajaran));
+        return Text(pelajaran.namePelajaran);
+      })),
       top: 0,
       left: 0,
       right: 0,

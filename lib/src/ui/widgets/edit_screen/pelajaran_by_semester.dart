@@ -55,10 +55,15 @@ class PelajaranBySemester extends StatelessWidget {
                 }
               },
             ),
-            leading: CircleAvatar(
-              backgroundImage: MemoryImage(
-                base64.decode(result.dosen.imageDosen),
-              ),
+            leading: Consumer(
+              builder: (context, watch, _) {
+                final dosen = watch(showDosenByid(result.dosen.idDosen));
+                return CircleAvatar(
+                  backgroundImage: MemoryImage(
+                    base64.decode(dosen.imageDosen),
+                  ),
+                );
+              },
             ),
             children: [
               ChipsDayPelajaran(result),
