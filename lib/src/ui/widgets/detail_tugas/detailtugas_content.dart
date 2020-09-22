@@ -14,31 +14,29 @@ class DetailTugasContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      child: Container(
-        decoration: BoxDecoration(
-          color: colorPallete.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(60)),
-          boxShadow: [
-            BoxShadow(offset: Offset(0, 0), color: Colors.black45, blurRadius: 2),
-          ],
-        ),
-        padding: const EdgeInsets.all(15.0),
+      child: Card(
+        margin: EdgeInsets.zero,
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(60))),
         child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              DetailTugasContentTitle(),
-              SizedBox(height: 10),
-              DetailTugasContentDescription(),
-              SizedBox(height: 20),
-              Row(
-                children: [
-                  DetailTugasContentLeftInfo(),
-                  DetailTugasContentRightInfo(),
-                ],
-              ),
-              SizedBox(height: kToolbarHeight),
-            ],
+          child: Padding(
+            padding: const EdgeInsets.all(15.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                DetailTugasContentTitle(),
+                SizedBox(height: 10),
+                DetailTugasContentDescription(),
+                SizedBox(height: 20),
+                Row(
+                  children: [
+                    DetailTugasContentLeftInfo(),
+                    DetailTugasContentRightInfo(),
+                  ],
+                ),
+                SizedBox(height: kToolbarHeight),
+              ],
+            ),
           ),
         ),
       ),
