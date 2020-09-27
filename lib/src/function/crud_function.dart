@@ -269,6 +269,7 @@ class CRUDFunction {
                   tempModel,
                   uniqueIDNotification,
                   whenReminderShow,
+                  lastID: modelEdit.idTugas,
                 );
               }
             },
@@ -620,7 +621,7 @@ class CRUDFunction {
     TugasModel model,
     int uniqueIDNotification,
     Duration duration, {
-    int lastID,
+    @required int lastID,
   }) async {
     await notificationPlugin.scheduleNotification(
       dateTimeShowNotification: model.deadlineTugas.subtract(duration),
