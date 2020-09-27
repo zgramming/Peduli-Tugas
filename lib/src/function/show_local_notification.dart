@@ -1,8 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/material.dart';
+import 'package:global_template/global_template.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -111,15 +112,16 @@ class NotificationPlugin {
       sound: RawResourceAndroidNotificationSound(soundName),
       largeIcon: DrawableResourceAndroidBitmap(largeIcon),
       enableLights: true,
-      color: const Color.fromARGB(255, 255, 0, 0),
+      color: colorPallete.primaryColor,
       ledColor: const Color.fromARGB(255, 255, 0, 0),
       ledOnMs: 1000,
       ledOffMs: 500,
       importance: Importance.Max,
       priority: Priority.High,
       playSound: true,
-      timeoutAfter: 5000,
-      autoCancel: true,
+      // timeoutAfter: 5000,
+      // autoCancel: true,
+
       styleInformation: BigTextStyleInformation(bodyNotification, contentTitle: titleNotification),
     );
     var iosChannelSpecifics = IOSNotificationDetails(
@@ -183,8 +185,16 @@ class NotificationPlugin {
       'show weekly channel id',
       'show weekly channel name',
       'show weekly description',
+      sound: RawResourceAndroidNotificationSound(soundName),
+      largeIcon: DrawableResourceAndroidBitmap(largeIcon),
+      enableLights: true,
+      color: colorPallete.primaryColor,
+      ledColor: const Color.fromARGB(255, 255, 0, 0),
+      ledOnMs: 1000,
+      ledOffMs: 500,
       importance: Importance.Max,
       priority: Priority.High,
+      playSound: true,
     );
     var iosChannelSpecifics = IOSNotificationDetails();
     var platformChannelSpecifics = NotificationDetails(
@@ -258,7 +268,7 @@ class NotificationPlugin {
     String base64Image,
     String title,
     String body, {
-    String payload = 'Defualt Payload',
+    String payload = 'Default Payload',
   }) async {
     // var attachmentPicturePath =
     //     await _downloadAndSaveFile('https://via.placeholder.com/800x200', 'attachment_img.jpg');
